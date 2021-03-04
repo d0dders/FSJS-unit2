@@ -69,6 +69,9 @@ function addPagination(list) {
       `
    }
    pageLinks.innerHTML = html;
+   // Add active class to first button element
+   const firstButton = document.querySelector(".link-list button:first-child");
+   firstButton.className = "active";
 }
 
 
