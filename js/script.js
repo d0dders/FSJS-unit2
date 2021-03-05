@@ -24,8 +24,7 @@ function showPage(list, page) {
    const studentList = document.querySelector(".student-list");
    studentList.innerHTML = '';
 
-   for (let i = startIndex; i < endIndex; i++) {
-      console.log(list[i]);
+   for (let i = startIndex; i < endIndex && i < list.length; i++) {
       const student = list[i];
       const picture = student.picture.large;
       const name = `${student.name.first} ${student.name.last}`;
@@ -60,7 +59,6 @@ function addPagination(list) {
    let html = '';
    const pageLinks = document.querySelector(".link-list");
    const numOfPages = Math.ceil(list.length / itemsPerPage);
-   console.log(numOfPages);
    for(let i = 1; i <= numOfPages; i++) {
       html += `          
       <li>
@@ -72,6 +70,17 @@ function addPagination(list) {
    // Add active class to first button element
    const firstButton = document.querySelector(".link-list button:first-child");
    firstButton.className = "active";
+
+   pageLinks.addEventListener('click', (event) => {
+      if (event.target.tagName == 'BUTTON') {
+         const current = document.querySelector(".active");
+         current.className = "";
+         event.target.className = "active";
+         
+         const selectedPage = parseInt(event.target.textContent)
+         showPage(data, selectedPage);
+      }
+   });
 }
 
 
