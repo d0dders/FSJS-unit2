@@ -3,14 +3,16 @@ Treehouse Techdegree:
 FSJS Project 2 - Data Pagination and Filtering
 */
 
+const pageLinks = document.querySelector(".link-list");
 const itemsPerPage = 9;
+let currentPage = 1;
+let list = getFilteredList(data);
 
 /*
 For assistance:
    Check out the "Project Resources" section of the Instructions tab: https://teamtreehouse.com/projects/data-pagination-and-filtering#instructions
    Reach out in your Slack community: https://treehouse-fsjs-102.slack.com/app_redirect?channel=unit-2
 */
-
 
 
 /*
@@ -24,30 +26,31 @@ function showPage(list, page) {
    const studentList = document.querySelector(".student-list");
    studentList.innerHTML = '';
 
-   for (let i = startIndex; i < endIndex && i < list.length; i++) {
-      const student = list[i];
-      const picture = student.picture.large;
-      const name = `${student.name.first} ${student.name.last}`;
-      const email = student.email;
-      const registeredDate = student.registered.date;
+   if (list.length == 0) {
+      studentList.innerHTML += '<h2 class="no-results">No results found</h2>';
+   } else {
+      for (let i = startIndex; i < endIndex && i < list.length; i++) {
+         const student = list[i];
+         const picture = student.picture.large;
+         const name = `${student.name.first} ${student.name.last}`;
+         const email = student.email;
+         const registeredDate = student.registered.date;
 
-      const html = `
-      <li class="student-item cf">
-         <div class="student-details">
-            <img class="avatar" src="${picture}" alt="Profile Picture">
-            <h3>${name}</h3>
-            <span class="email">${email}</span>
-         </div>
-         <div class="joined-details">
-            <span class="date">Joined ${registeredDate}</span>
-         </div>
-      </li>
-      `;
-      studentList.insertAdjacentHTML('beforeend', html);
-      
+         const html = `
+         <li class="student-item cf">
+            <div class="student-details">
+               <img class="avatar" src="${picture}" alt="Profile Picture">
+               <h3>${name}</h3>
+               <span class="email">${email}</span>
+            </div>
+            <div class="joined-details">
+               <span class="date">Joined ${registeredDate}</span>
+            </div>
+         </li>
+         `;
+         studentList.insertAdjacentHTML('beforeend', html);
+      }
    }
-
-
 }
 
 
@@ -57,30 +60,18 @@ This function will create and insert/append the elements needed for the paginati
 */
 function addPagination(list) {
    let html = '';
-   const pageLinks = document.querySelector(".link-list");
+   
    const numOfPages = Math.ceil(list.length / itemsPerPage);
+   if (currentPage > numOfPages) { currentPage = numOfPages }
+   else if (currentPage < numOfPages) { currentPage = 1 };
    for(let i = 1; i <= numOfPages; i++) {
       html += `          
       <li>
-         <button type="button">${i}</button>
+         <button type="button"${ i == currentPage ? 'class="active"' : '' }>${i}</button>
       </li>
       `
    }
    pageLinks.innerHTML = html;
-   // Add active class to first button element
-   const firstButton = document.querySelector(".link-list button:first-child");
-   firstButton.className = "active";
-
-   pageLinks.addEventListener('click', (event) => {
-      if (event.target.tagName == 'BUTTON') {
-         const current = document.querySelector(".active");
-         current.className = "";
-         event.target.className = "active";
-         
-         const selectedPage = parseInt(event.target.textContent)
-         showPage(data, selectedPage);
-      }
-   });
 }
 
 /*
@@ -100,7 +91,63 @@ function addSearch() {
 }
 
 
-// Call functions
+/*
+Create the `search` function
+This function will take the list of data and a search, and return a filtered list
+*/
+function getFilteredList(list, searchString = "") {
+   if(searchString.length == 0) {
+      return list;
+   } else {
+      let filteredList = []
+      for (let i = 0; i < list.length; i++) {
+         const studentName = list[i].name.first + " " + list[i].name.last;
+         if (studentName.toLowerCase().includes(searchString)){
+            filteredList.push(list[i]);
+         }
+      }
+      return filteredList;
+   }
+}
+
+pageLinks.addEventListener('click', (event) => {
+   if (event.target.tagName == 'BUTTON') {
+      const current = document.querySelector(".active");
+      current.className = "";
+      event.target.className = "active";
+      
+      const selectedPage = parseInt(event.target.textContent)
+      currentPage = selectedPage;
+      showPage(list, currentPage);
+   }
+})
+
+
+
+
+
+
 addSearch();
-showPage(data, 1);
-addPagination(data);
+
+
+const searchField = document.getElementById("search");
+searchField.addEventListener('keyup', () => {
+   refreshPage();
+});
+const searchButton = document.querySelector("button");
+searchButton.addEventListener('click', () => {
+   refreshPage()
+});
+
+
+function refreshPage() {
+   list = getFilteredList(data, searchField.value.toLowerCase());
+   showPage(list, 1);
+   addPagination(list);
+}
+
+
+// Functions to run when page loads
+refreshPage();
+
+
