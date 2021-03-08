@@ -8,17 +8,12 @@ const itemsPerPage = 9;
 let currentPage = 1;
 let list = getFilteredList(data);
 
-/*
-For assistance:
-   Check out the "Project Resources" section of the Instructions tab: https://teamtreehouse.com/projects/data-pagination-and-filtering#instructions
-   Reach out in your Slack community: https://treehouse-fsjs-102.slack.com/app_redirect?channel=unit-2
-*/
 
-
-/*
-Create the `showPage` function
-This function will create and insert/append the elements needed to display a "page" of nine students
-*/
+/**
+ *This function will create and insert/append the elements needed to display a "page" of nine students
+ *@param {Object[]} list - An array of objects representing students
+ *@param {string} page - Which page of students to display
+ */
 function showPage(list, page) {
    const endIndex = page * itemsPerPage;
    const startIndex = endIndex - itemsPerPage;
@@ -54,13 +49,12 @@ function showPage(list, page) {
 }
 
 
-/*
-Create the `addPagination` function
-This function will create and insert/append the elements needed for the pagination buttons
-*/
+/**
+ * This function will create and insert/append the elements needed for the pagination buttons
+ * @param {Object[]} list - An array of objects representing students
+ */
 function addPagination(list) {
    let html = '';
-   
    const numOfPages = Math.ceil(list.length / itemsPerPage);
    if (currentPage > numOfPages) { currentPage = numOfPages }
    else if (currentPage < numOfPages) { currentPage = 1 };
@@ -74,10 +68,9 @@ function addPagination(list) {
    pageLinks.innerHTML = html;
 }
 
-/*
-Create the `addSearch` function
-This function will create and insert/append the elements needed for the search inputs
-*/
+/**
+ *This function will create and insert/append the elements needed for the search inputs
+ */
 function addSearch() {
    const header = document.querySelector(".header");
    const html = `
@@ -91,10 +84,12 @@ function addSearch() {
 }
 
 
-/*
-Create the `search` function
-This function will take the list of data and a search, and return a filtered list
-*/
+/**
+ *This function will take the list of data and a search, and return a filtered list
+ *@param {Object[]} list - An array of objects representing students
+ *@param {string} [searchString] - The search string to use to filter the list
+ *@return {Object[]} - An array of objects representing students that match the provided search string
+ */
 function getFilteredList(list, searchString = "") {
    if(searchString.length == 0) {
       return list;
@@ -123,12 +118,20 @@ pageLinks.addEventListener('click', (event) => {
 })
 
 
+/**
+ * Called when the page needs to update the data displayed (after a search or  page refresh)
+ */
+ function refreshPage() {
+   list = getFilteredList(data, searchField.value.toLowerCase());
+   showPage(list, 1);
+   addPagination(list);
+}
 
 
-
-
+/**
+ * The below function call and event listeners setup the seach inputs and interactivity
+ */
 addSearch();
-
 
 const searchField = document.getElementById("search");
 searchField.addEventListener('keyup', () => {
@@ -140,14 +143,9 @@ searchButton.addEventListener('click', () => {
 });
 
 
-function refreshPage() {
-   list = getFilteredList(data, searchField.value.toLowerCase());
-   showPage(list, 1);
-   addPagination(list);
-}
-
-
-// Functions to run when page loads
+/**
+ * Call the refreshPage function to display students on page load
+ */
 refreshPage();
 
 
